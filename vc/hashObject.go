@@ -14,12 +14,14 @@ func HashObject(path string) {
 	if err != nil {
 		log.Fatalf("Error reading file [%v] - %v", path, err)
 	}
-	fmt.Println(hashObject(data))
+	fmt.Println(hashObject(data, "blob"))
 }
 
-func hashObject(data []byte) string {
+func hashObject(data []byte, type_ string) string {
+	obj := append([]byte(type_), []byte("\x00")...)
+	obj = append(obj, data...)
 	hashFunc := sha1.New()
-	hashFunc.Write(data)
+	hashFunc.Write(obj)
 	oid := hashFunc.Sum(nil)
 	oidHex := fmt.Sprintf("%x", oid)
 	filePath := filepath.Join(VcDir, "objects", oidHex)
@@ -34,7 +36,7 @@ func hashObject(data []byte) string {
 		}
 	}()
 
-	if _, err := f.Write(data); err != nil {
+	if _, err := f.Write(obj); err != nil {
 		panic(err)
 	}
 	return oidHex
