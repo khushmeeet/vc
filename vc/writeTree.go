@@ -1,7 +1,7 @@
 package vc
 
 import (
-	"io/fs"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"path/filepath"
@@ -9,33 +9,33 @@ import (
 )
 
 func WriteTree(path string) {
-	writeTree(path)
+	oid := writeTree(path)
+	fmt.Println(oid)
 }
 
 func writeTree(directory string) string {
 	oid, type_ := "", ""
 	var entries [][]string
-	err := filepath.WalkDir(directory, func(path string, d fs.DirEntry, err error) error {
-		if d.IsDir() && filepath.Base(path) == VcDir {
-			return filepath.SkipDir
-		}
-		if d.IsDir() {
-			type_ = "tree"
-			oid = writeTree(path)
-		}
-		if !d.IsDir() {
-			type_ = "blob"
-			f, err := ioutil.ReadFile(path)
-			if err != nil {
-				return err
-			}
-			oid = hashObject(f, type_)
-		}
-		entries = append(entries, []string{filepath.Base(path), oid, type_})
-		return nil
-	})
+
+	fs, err := ioutil.ReadDir(directory)
 	if err != nil {
-		log.Fatalf("Error scanning dir [%v] - %v", directory, err)
+		log.Fatalf("Error reading dir [%v] - %v", directory, err)
+	}
+
+	for _, f := range fs {
+		filePath := filepath.Join(directory, f.Name())
+		if f.IsDir() {
+			type_ = "tree"
+			oid = writeTree(filePath)
+		} else {
+			type_ = "blob"
+			data, err := ioutil.ReadFile(filePath)
+			if err != nil {
+				log.Fatalf("Error reading file [%v] - %v", filePath, err)
+			}
+			oid = hashObject(data, type_)
+		}
+		entries = append(entries, []string{type_, oid, filepath.Base(filePath)})
 	}
 
 	var hashData []string
