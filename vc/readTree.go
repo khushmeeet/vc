@@ -18,6 +18,11 @@ func ReadTree(treeOid string) {
 }
 
 func readTree(treeOid string) error {
+	err := emptyCurrentDirectory()
+	if err != nil {
+		return err
+	}
+
 	results, err := getTree(treeOid, "./")
 	if err != nil {
 		return err
@@ -82,4 +87,18 @@ func iterTreeEntries(oid string) [][]string {
 		treeSlice = append(treeSlice, hashed)
 	}
 	return treeSlice
+}
+
+func emptyCurrentDirectory() error {
+	fs, err := ioutil.ReadDir(".")
+	if err != nil {
+		return err
+	}
+
+	for _, f := range fs {
+		if f.Name() != VcDir {
+			_ = os.Remove(f.Name())
+		}
+	}
+	return nil
 }
