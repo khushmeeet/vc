@@ -24,6 +24,9 @@ func writeTree(directory string) string {
 
 	for _, f := range fs {
 		filePath := filepath.Join(directory, f.Name())
+		if f.Name() == VcDir {
+			continue
+		}
 		if f.IsDir() {
 			type_ = "tree"
 			oid = writeTree(filePath)
