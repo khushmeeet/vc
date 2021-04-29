@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func Commit(message string) {
+func DoCommit(message string) {
 	fmt.Println(commit(message))
 }
 
