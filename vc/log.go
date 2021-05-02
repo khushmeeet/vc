@@ -13,10 +13,13 @@ type Commit struct {
 	Message string
 }
 
-func Log() {
-	head, err := getHEAD()
-	if err != nil {
-		log.Fatalf("error getting HEAD - %v", err)
+func Log(oid string) {
+	head := ""
+
+	if oid != "" {
+		head = oid
+	} else {
+		head, _ = getHEAD()
 	}
 
 	for head != "" {
