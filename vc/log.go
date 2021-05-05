@@ -19,7 +19,7 @@ func Log(oid string) {
 	if oid != "" {
 		head = oid
 	} else {
-		head, _ = getHEAD()
+		head, _ = getRef("HEAD")
 	}
 
 	for head != "" {
