@@ -7,17 +7,14 @@ import (
 )
 
 func Tag(name, oid string) {
-	tag := ""
-	if oid != "" {
-		tag = oid
-	} else {
-		tag, _ = getRef("HEAD")
-	}
-
-	createTag(name, tag)
+	createTag(name, oid)
 }
 
 func GetOid(name string) string {
+	if name == "@" {
+		name = "HEAD"
+	}
+
 	refsToTry := [4]string{
 		fmt.Sprintf("%v", name),
 		fmt.Sprintf("refs/%v", name),

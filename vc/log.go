@@ -14,13 +14,7 @@ type Commit struct {
 }
 
 func Log(oid string) {
-	head := ""
-
-	if oid != "" {
-		head = oid
-	} else {
-		head, _ = getRef("HEAD")
-	}
+	head := oid
 
 	for head != "" {
 		commit, err := getCommit(head)

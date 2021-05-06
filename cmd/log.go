@@ -21,7 +21,8 @@ to quickly create a Cobra application.`,
 			oid := vc.GetOid(args[0])
 			vc.Log(oid)
 		} else {
-			vc.Log("")
+			oid := vc.GetOid("@")
+			vc.Log(oid)
 		}
 	},
 }

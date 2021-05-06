@@ -18,7 +18,8 @@ to quickly create a Cobra application.`,
 	Args: cobra.RangeArgs(1, 2),
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 1 {
-			vc.Tag(args[0], "")
+			oid := vc.GetOid("@")
+			vc.Tag(args[0], oid)
 		} else {
 			oid := vc.GetOid(args[1])
 			vc.Tag(args[0], oid)
