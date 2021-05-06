@@ -17,7 +17,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		vc.Checkout(args[0])
+		oid := vc.GetOid(args[0])
+		vc.Checkout(oid)
 	},
 }
 

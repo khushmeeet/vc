@@ -2,8 +2,8 @@ package vc
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -63,6 +63,6 @@ func getRef(ref string) (string, error) {
 		head := strings.Trim(string(f), " ")
 		return head, nil
 	} else {
-		return "", errors.New(fmt.Sprintf("%v does not exists", ref))
+		return "", errors.New(fmt.Sprintf("%v does not exists", refPath))
 	}
 }

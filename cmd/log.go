@@ -18,7 +18,8 @@ to quickly create a Cobra application.`,
 	Args: cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 1 {
-			vc.Log(args[0])
+			oid := vc.GetOid(args[0])
+			vc.Log(oid)
 		} else {
 			vc.Log("")
 		}

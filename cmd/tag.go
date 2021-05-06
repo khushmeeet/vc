@@ -20,7 +20,8 @@ to quickly create a Cobra application.`,
 		if len(args) == 1 {
 			vc.Tag(args[0], "")
 		} else {
-			vc.Tag(args[0], args[1])
+			oid := vc.GetOid(args[1])
+			vc.Tag(args[0], oid)
 		}
 	},
 }

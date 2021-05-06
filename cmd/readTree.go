@@ -3,7 +3,6 @@ package cmd
 import (
 	"github.com/khushmeeet/vc/vc"
 	"github.com/spf13/cobra"
-	"log"
 )
 
 // readTreeCmd represents the readTree command
@@ -16,14 +15,10 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) < 1 {
-			log.Fatal("Please provide directory OID!")
-		}
-		if len(args) != 1 {
-			log.Fatal("Please provide only one argument!")
-		}
-		vc.ReadTree(args[0])
+		oid := vc.GetOid(args[0])
+		vc.ReadTree(oid)
 	},
 }
 
