@@ -34,17 +34,6 @@ func GetOid(name string) string {
 	} else {
 		return ""
 	}
-
-	//ref, err := getRef(name)
-	//if err != nil {
-	//	log.Fatalf("error getting ref - %v", err)
-	//}
-	//
-	//if ref != "" {
-	//	return ref
-	//} else {
-	//	return name
-	//}
 }
 
 func createTag(name, oid string) {
