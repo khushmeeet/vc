@@ -18,7 +18,11 @@ func Init() {
 	}
 
 	if err = os.Mkdir(filepath.Join(VcDir, "objects"), 0744); err != nil {
+		log.Fatalf("Error creating dir [%v] - %v", filepath.Join(VcDir, "objects"), err)
+	}
 
+	if err = os.Mkdir(filepath.Join(VcDir, "refs"), 0744); err != nil {
+		log.Fatalf("Error creating dir [%v] - %v", filepath.Join(VcDir, "refs"), err)
 	}
 
 	fmt.Printf("Initialized empty vc repository in %v/%v", currentDir, VcDir)
