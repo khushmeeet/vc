@@ -14,18 +14,18 @@ type Commit struct {
 }
 
 func Log(oid string) {
-	head := oid
+	oids := iterCommitsAndParents(oid)
 
-	for head != "" {
-		commit, err := getCommit(head)
+	for _, oid := range oids {
+		commit, err := getCommit(oid)
 		if err != nil {
 			log.Fatalf("error getting commit - %v", err)
 		}
 
-		fmt.Printf("commit %v\n", head)
+		fmt.Printf("commit %v\n", oid)
 		fmt.Printf("%v\n", commit.Message)
 		fmt.Println("------------------------")
-		head = commit.Parent
+		oid = commit.Parent
 	}
 }
 

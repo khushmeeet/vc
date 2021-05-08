@@ -73,10 +73,12 @@ func K() {
 }
 
 func iterCommitsAndParents(oids ...string) []string {
+	oidsList := oids
 	var visited []string
 	var iters []string
 
-	for _, oid := range oids {
+	for i := 0; i < len(oidsList); i++ {
+		oid := oidsList[len(oidsList)-1]
 		if oid == "" || contains(visited, oid) {
 			continue
 		}
@@ -86,7 +88,7 @@ func iterCommitsAndParents(oids ...string) []string {
 		if err != nil {
 			log.Fatalf("error getting commit - %v", err)
 		}
-		oids = append(oids, commit.Parent)
+		oidsList = append(oidsList, commit.Parent)
 	}
 	return iters
 }
