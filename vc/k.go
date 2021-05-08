@@ -1,15 +1,21 @@
 package vc
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io/fs"
+	"io/ioutil"
 	"log"
+	"os/exec"
 	"path/filepath"
+	"strings"
 )
 
 func K() {
 	var oids []string
+	var dot bytes.Buffer
+	dot.WriteString("digraph commits {\n")
 
 	refs := iterRefs()
 	refGen := yieldRefs(refs)
@@ -18,7 +24,8 @@ func K() {
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(refName, ref)
+		dot.WriteString(fmt.Sprintf("\"%v\" [shape=note]\n", refName))
+		dot.WriteString(fmt.Sprintf("\"%v\" -> \"%v\"\n", refName, ref))
 		oids = append(oids, ref)
 	}
 
@@ -27,11 +34,42 @@ func K() {
 		if err != nil {
 			log.Fatalf("error getting commit - %v", err)
 		}
-		fmt.Println(oid)
+		dot.WriteString(fmt.Sprintf("\"%v\" [shape=box style=filled label=\"%v\"]\n", oid, oid[:10]))
 		if commit.Parent != "" {
-			fmt.Println("Parent ", commit.Parent)
+			dot.WriteString(fmt.Sprintf("\"%v\" -> \"%v\"\n", oid, commit.Parent))
 		}
 	}
+
+	dot.WriteString("}")
+	fmt.Println(dot.String())
+
+	dotCmd := exec.Command("dot", "-Tpng", "/dev/stdin")
+	dotCmdIn, err := dotCmd.StdinPipe()
+	if err != nil {
+		panic(err)
+	}
+
+	dotCmdOut, _ := dotCmd.StdoutPipe()
+	err = dotCmd.Start()
+	if err != nil {
+		panic(err)
+	}
+	_, err = dotCmdIn.Write(dot.Bytes())
+	if err != nil {
+		panic(err)
+	}
+	err = dotCmdIn.Close()
+	if err != nil {
+		panic(err)
+	}
+	b, _ := ioutil.ReadAll(dotCmdOut)
+	ioutil.WriteFile("vc.png", b, 0755)
+	err = dotCmd.Wait()
+	if err != nil {
+		panic(err.Error())
+	}
+
+	//dotCmdOut.Read()
 }
 
 func iterCommitsAndParents(oids ...string) []string {
@@ -57,7 +95,11 @@ func iterRefs() []string {
 	refs := []string{"HEAD"}
 
 	err := filepath.WalkDir(filepath.Join(VcDir, "refs"), func(path string, d fs.DirEntry, err error) error {
-		refs = append(refs, path)
+		if !d.IsDir() {
+			relPath := strings.TrimPrefix(path, VcDir)
+			refs = append(refs, relPath)
+			return nil
+		}
 		return nil
 	})
 	if err != nil {
@@ -72,7 +114,10 @@ func yieldRefs(refs []string) func() (string, string, error) {
 	n := 0
 	return func() (string, string, error) {
 		if n < refsLen {
-			oid, _ := getRef(refs[n])
+			oid, err := getRef(refs[n])
+			if err != nil {
+				log.Fatalf("%v", err)
+			}
 			ref := refs[n]
 			n = n + 1
 			return ref, oid, nil
