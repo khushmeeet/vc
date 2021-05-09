@@ -23,10 +23,11 @@ func GetOid(name string) string {
 	}
 
 	for _, ref := range refsToTry {
-		oid, err := getRef(ref)
-		if err == nil {
-			return oid
+		rv, err := getRef(ref)
+		if err != nil {
+			log.Fatalf("error getting ref - %v", err)
 		}
+		return rv.value
 	}
 
 	if len(name) == 40 {
@@ -38,7 +39,7 @@ func GetOid(name string) string {
 
 func createTag(name, oid string) {
 	tagPath := filepath.Join("refs", "tags", name)
-	err := updateRef(tagPath, oid)
+	err := updateRef(tagPath, RefValue{symbolic: false, value: oid})
 	if err != nil {
 		log.Fatalf("error creating tag - %v", err)
 	}

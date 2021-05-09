@@ -25,8 +25,8 @@ func K() {
 			panic(err)
 		}
 		dot.WriteString(fmt.Sprintf("\"%v\" [shape=note]\n", refName))
-		dot.WriteString(fmt.Sprintf("\"%v\" -> \"%v\"\n", refName, ref))
-		oids = append(oids, ref)
+		dot.WriteString(fmt.Sprintf("\"%v\" -> \"%v\"\n", refName, ref.value))
+		oids = append(oids, ref.value)
 	}
 
 	for _, oid := range iterCommitsAndParents(oids...) {
@@ -111,10 +111,10 @@ func iterRefs() []string {
 	return refs
 }
 
-func yieldRefs(refs []string) func() (string, string, error) {
+func yieldRefs(refs []string) func() (string, RefValue, error) {
 	refsLen := len(refs)
 	n := 0
-	return func() (string, string, error) {
+	return func() (string, RefValue, error) {
 		if n < refsLen {
 			oid, err := getRef(refs[n])
 			if err != nil {
@@ -124,7 +124,7 @@ func yieldRefs(refs []string) func() (string, string, error) {
 			n = n + 1
 			return ref, oid, nil
 		}
-		return "", "", errors.New("yield complete")
+		return "", RefValue{}, errors.New("yield complete")
 	}
 }
 

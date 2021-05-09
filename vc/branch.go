@@ -16,7 +16,7 @@ func Branch(name, oid string) {
 }
 
 func createBranch(name, oid string) error {
-	err := updateRef(filepath.Join("refs", "heads", name), oid)
+	err := updateRef(filepath.Join("refs", "heads", name), RefValue{symbolic: false, value: oid})
 	if err != nil {
 		return err
 	}

@@ -17,7 +17,7 @@ func checkout(oid string) {
 		log.Fatalf("error reading tree commit - %v", err)
 	}
 
-	err = updateRef("HEAD", oid)
+	err = updateRef("HEAD", RefValue{symbolic: false, value: oid})
 	if err != nil {
 		log.Fatalf("error setting HEAD - %v", err)
 	}

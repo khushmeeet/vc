@@ -7,12 +7,6 @@ import (
 	"strings"
 )
 
-type Commit struct {
-	Tree    string
-	Parent  string
-	Message string
-}
-
 func Log(oid string) {
 	oids := iterCommitsAndParents(oid)
 
