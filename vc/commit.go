@@ -55,13 +55,20 @@ func updateRef(ref, oid string) error {
 
 func getRef(ref string) (string, error) {
 	refPath := filepath.Join(VcDir, ref)
-	if _, err := os.Stat(refPath); !os.IsNotExist(err) {
-		f, err := ioutil.ReadFile(refPath)
-		if err != nil {
-			return "", err
+	if stat, err := os.Stat(refPath); !os.IsNotExist(err) {
+		if !stat.IsDir() {
+			f, err := ioutil.ReadFile(refPath)
+			if err != nil {
+				return "", err
+			}
+			value := strings.Trim(string(f), " ")
+			if strings.HasSuffix(value, "ref:") {
+				parentRef, err := getRef(strings.TrimSuffix(strings.Split(value, ":")[1], " "))
+				return parentRef, err
+			}
+			return value, nil
 		}
-		head := strings.Trim(string(f), " ")
-		return head, nil
+		return "", errors.New(fmt.Sprintf("%v is not a file", refPath))
 	} else {
 		return "", errors.New(fmt.Sprintf("%v does not exists", refPath))
 	}
