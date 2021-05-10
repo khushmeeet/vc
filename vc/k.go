@@ -18,7 +18,7 @@ func K() {
 	dot.WriteString("digraph commits {\n")
 
 	refs := iterRefs()
-	refGen := yieldRefs(refs)
+	refGen := yieldRefs(refs, false)
 	for _ = range refs {
 		refName, ref, err := refGen()
 		if err != nil {
@@ -26,7 +26,9 @@ func K() {
 		}
 		dot.WriteString(fmt.Sprintf("\"%v\" [shape=note]\n", refName))
 		dot.WriteString(fmt.Sprintf("\"%v\" -> \"%v\"\n", refName, ref.value))
-		oids = append(oids, ref.value)
+		if !ref.symbolic {
+			oids = append(oids, ref.value)
+		}
 	}
 
 	for _, oid := range iterCommitsAndParents(oids...) {
@@ -68,8 +70,6 @@ func K() {
 	if err != nil {
 		panic(err.Error())
 	}
-
-	//dotCmdOut.Read()
 }
 
 func iterCommitsAndParents(oids ...string) []string {
@@ -111,15 +111,12 @@ func iterRefs() []string {
 	return refs
 }
 
-func yieldRefs(refs []string) func() (string, RefValue, error) {
+func yieldRefs(refs []string, deref bool) func() (string, RefValue, error) {
 	refsLen := len(refs)
 	n := 0
 	return func() (string, RefValue, error) {
 		if n < refsLen {
-			oid, err := getRef(refs[n])
-			if err != nil {
-				log.Fatalf("%v", err)
-			}
+			oid := getRef(refs[n], deref)
 			ref := refs[n]
 			n = n + 1
 			return ref, oid, nil

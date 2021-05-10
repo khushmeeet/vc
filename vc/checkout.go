@@ -1,13 +1,19 @@
 package vc
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 func Checkout(oid string) {
 	checkout(oid)
 }
 
-func checkout(oid string) {
-	commit, err := getCommit(oid)
+func checkout(name string) {
+	oid := GetOid(name)
+	var head RefValue
+
+	commit, err := getCommit(name)
 	if err != nil {
 		log.Fatalf("error getting commit - %v", err)
 	}
@@ -17,8 +23,18 @@ func checkout(oid string) {
 		log.Fatalf("error reading tree commit - %v", err)
 	}
 
-	err = updateRef("HEAD", RefValue{symbolic: false, value: oid})
+	if isBranch(name) {
+		head = RefValue{symbolic: true, value: fmt.Sprintf("refs/heads/%v", name)}
+	} else {
+		head = RefValue{symbolic: false, value: oid}
+	}
+
+	err = updateRef("HEAD", head, false)
 	if err != nil {
 		log.Fatalf("error setting HEAD - %v", err)
 	}
+}
+
+func isBranch(branch string) bool {
+	return getRef(fmt.Sprintf("refs/heads/%v", branch), true).value != ""
 }
