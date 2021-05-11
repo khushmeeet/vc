@@ -23,14 +23,12 @@ func GetOid(name string) string {
 	}
 
 	for _, ref := range refsToTry {
-		return getRef(ref, false).value
+		val := getRef(ref, false).value
+		if val != "" {
+			return val
+		}
 	}
-
-	if len(name) == 40 {
-		return name
-	} else {
-		return ""
-	}
+	return ""
 }
 
 func createTag(name, oid string) {

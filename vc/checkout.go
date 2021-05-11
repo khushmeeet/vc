@@ -13,7 +13,7 @@ func checkout(name string) {
 	oid := GetOid(name)
 	var head RefValue
 
-	commit, err := getCommit(name)
+	commit, err := getCommit(oid)
 	if err != nil {
 		log.Fatalf("error getting commit - %v", err)
 	}

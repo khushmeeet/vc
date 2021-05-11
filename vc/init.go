@@ -25,5 +25,10 @@ func Init() {
 		log.Fatalf("Error creating dir [%v] - %v", filepath.Join(VcDir, "refs"), err)
 	}
 
+	err = updateRef("HEAD", RefValue{symbolic: true, value: "refs/heads/master"}, true)
+	if err != nil {
+		log.Fatalf("error creating master branch - %v", err)
+	}
+
 	fmt.Printf("Initialized empty vc repository in %v/%v", currentDir, VcDir)
 }

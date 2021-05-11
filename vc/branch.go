@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"strings"
 )
 
 func Branch(name, oid string) {
@@ -22,4 +23,17 @@ func createBranch(name, oid string) error {
 	}
 
 	return nil
+}
+
+func getBranchName() string {
+	head := getRef("HEAD", false)
+	if !head.symbolic {
+		return ""
+	}
+	headVal := head.value
+	if strings.HasPrefix(headVal, "refs/heads/") {
+		relpath, _ := filepath.Rel("refs/heads/", headVal)
+		return relpath
+	}
+	return ""
 }
